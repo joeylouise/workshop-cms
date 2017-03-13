@@ -1,6 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var querystring = require('querystring');
 
 var message1 = 'I am so happy to be part of the Node Girls workshop!';
 var message2 = 'You are on the girls page!';
@@ -39,7 +40,23 @@ function handler (request, response) {
         response.end(file);
 
   });
+
+  var allTheData = '';
+  request.on('data', function (chunkOfData) {
+
+      allTheData += chunkOfData;
+  });
+
+  request.on('end', function () {
+
+      var convertedData = querystring.parse(allTheData);
+      response.writeHead(302, {"Location": '/'});
+      response.end();
+  });
 }
+
+
+
 }
 
 var server = http.createServer(handler);
