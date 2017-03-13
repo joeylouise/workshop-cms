@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+var path = require('path');
 
 var message1 = 'I am so happy to be part of the Node Girls workshop!';
 var message2 = 'You are on the girls page!';
@@ -7,20 +8,38 @@ var message2 = 'You are on the girls page!';
 function handler (request, response) {
 
   var endpoint = request.url;
+  console.log(endpoint);
   var method = request.method;
 
   if (endpoint === "/") {
     response.writeHead(200, {"Content-Type": "text/html"});
-
-    fs.readFile(__dirname + '/public/index.html', function(error, file) {
+    fs.readFile(path.join(__dirname, 'public/index.html'), function(error, file) {
       if (error) {
         console.log(error);
         return;
       }
-
       response.end(file);
     });
-  }
+  } else{
+      var extension = endpoint.split('.')[1];
+      var extensionType = {
+        "html": "text/html",
+        "css": "text/css",
+        "js": "application/javascript",
+        "ico": "image/x-icon",
+        "jpg": "image/jpg",
+        "png": "image/png"
+      };
+      fs.readFile(path.join(__dirname, "public", endpoint), function(error, file) {
+        if (error) {
+          console.log(error);
+          return;
+        }
+        response.writeHead(200, {"Content-Type": extensionType[extension]});
+        response.end(file);
+
+  });
+}
 }
 
 var server = http.createServer(handler);
